@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="04f7ad26-a4b7-46b5-8d53-3f1f453b89d5" name="s2110206">
+        <fileTransfer accessType="SFTP" host="kagayaki.jaist.ac.jp" port="22" sshConfigId="3bbb14c4-166c-4016-9c35-776fcbb0bda3" sshConfig="s2110206@kagayaki.jaist.ac.jp:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+      <webServer id="73ba3211-f224-4201-b28c-88491ba313aa" name="w2">
+        <fileTransfer accessType="SFTP" host="118.138.155.96" port="22" sshConfigId="e31df6c8-3245-4227-ac69-03525dbc8213" sshConfig="minhtuan@118.138.155.96:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

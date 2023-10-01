@@ -114,9 +114,6 @@ class NAYER(BaseSynthesis):
         self.dataset = dataset
         self.label_list = torch.LongTensor([i for i in range(self.num_classes)])
 
-        self.mean = torch.tensor(torch.ones(self.synthesis_batch_size, 3, 224, 224) * 0.5, requires_grad=True, device=self.device)
-        self.std = torch.tensor(torch.ones(self.synthesis_batch_size, 3, 224, 224) * 0.5, requires_grad=True, device=self.device)
-
         for m in teacher.modules():
             if isinstance(m, nn.BatchNorm2d):
                 self.hooks.append(DeepInversionHook(m, self.bn_mmt))
@@ -124,7 +121,7 @@ class NAYER(BaseSynthesis):
         if dataset == "imagenet" or dataset == "tiny_imagenet":
             self.aug = transforms.Compose([
                 augmentation.RandomCrop(size=[self.img_size[-2], self.img_size[-1]], padding=4),
-                # normalizer,
+                normalizer,
             ])
         else:
             self.aug = transforms.Compose([
@@ -156,8 +153,6 @@ class NAYER(BaseSynthesis):
 
         if (self.ep - self.ep_start) % self.g_life == 0 or self.ep % self.g_life == 0:
             self.generator = self.generator.reinit()
-            self.mean = torch.tensor(torch.ones(self.synthesis_batch_size, 3, 224, 224) * 0.5, requires_grad=True, device=self.device)
-            self.std = torch.tensor(torch.ones(self.synthesis_batch_size, 3, 224, 224) * 0.5, requires_grad=True, device=self.device)
 
         if self.ep < self.ep_start:
             g_loops = self.gwp_loops
@@ -182,22 +177,15 @@ class NAYER(BaseSynthesis):
             ys = ys.to(self.device)
             targets = targets.to(self.device)
 
-            # optimizer = torch.optim.Adam([
-            #     {'params': self.generator.parameters()},
-            # ], lr=self.lr_g, betas=[0.5, 0.999])
-
             optimizer = torch.optim.Adam([
                 {'params': self.generator.parameters()},
-                {'params': [self.mean], 'lr': 0.001},
-                {'params': [self.std], 'lr': 0.001}
             ], lr=self.lr_g, betas=[0.5, 0.999])
 
             for it in range(self.g_steps):
                 inputs = self.generator(targets=targets)
                 if self.dataset == "imagenet":
                     inputs = self.jitter_and_flip(inputs)
-                    inputs = self.aug(inputs)
-                    inputs_aug = (inputs - self.mean[:, :, :, :]) / (self.std[:, :, :, :])
+                    inputs_aug = self.aug(inputs)
                 else:
                     inputs_aug = self.aug(inputs)
 
